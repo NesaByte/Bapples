@@ -15,26 +15,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;*/
 
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Scanner;
 import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.net.ssl.SSLHandshakeException;
-
 import java.io.*;
-/*
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;*/
 
 public class Cleaner {
-
 	
 	public static final String ANSI_RESET = "\u001B[0m";
 	public static final String ANSI_BLACK = "\u001B[30m";
@@ -56,7 +44,7 @@ public class Cleaner {
 	{
 		
 		String mUrl, html = "";
-		HashSet<String> tree;
+		HashSet<String> m_url;
 		HashSet<String> commands;
 		
 	   if (args.length == 0)
@@ -74,24 +62,30 @@ public class Cleaner {
 		   commands = pullCommands(mUrl);	   
 		
 		   //get the urls from the command
-		   tree = pullLinks(mUrl);
+		   m_url = pullLinks(mUrl);
 		   
 		   //get html from the command
 		   html = pullHTML(mUrl);
 	   }
 	   else{	
-		  
+		   
 		   StringJoiner sb = new StringJoiner("");
+		   
+		   //loop through the args[] and save it into 1 string to be processed
 		   for(int i = 0; i < args.length; i++) {
 			   sb.add(args[i] + " ");
 		   }
-
-		      String str = sb.toString();
+		   
+		   //turn the StringJoiner into a plain String
+		   String str = sb.toString();
+		   
+		   //get the commands from the command
 		   commands = pullCommands(str);	   
 		
 		   //get the urls from the command
-		   tree = pullLinks(str);
+		   m_url = pullLinks(str);
 		   
+		   //get the html from the command
 		   html = pullHTML(str);
 		   
 		   
@@ -99,56 +93,82 @@ public class Cleaner {
 		   
 	   
 	   try {		   
-		   if(commands.size() > 0) { //if user input more than 0 commands
+		 //if user gave 1 or more commands
+		   if(commands.size() > 0) { 
+			   
+			   //loop through all the commands from the user
 			   for(String cmds : commands) {
-			   if(cmds.equals("--v") ||  cmds.equals("--version") )  {
+			   
+				   //if user wants the check the version
+				   if(cmds.equals("--v") ||  cmds.equals("--version") )  {
 				   System.out.println("Bapples version: bap.v.01");
-			   }
-			   else if(cmds.matches("--h") ||  cmds.matches("--help")) {
+			   
+				   //if you wants to check the help
+				   } else if(cmds.matches("--h") ||  cmds.matches("--help")) {
 				   bappleHelp();
-			   }
-			   else if(cmds.matches("--[0-9][0-9][0-9]") && tree.size() > 0){ 
+			   
+				   //if user gives status command with a url
+				   } else if(cmds.matches("--[0-9][0-9][0-9]") && m_url.size() > 0){ 
 				   String number = cmds.substring(2);
 				   int num = Integer.parseInt(number.trim());
 				   System.out.println("            nums: " + number);
-				   classifyingApples(tree, num);					   
-			   }else if(cmds.matches("--[0-9][0-9][0-9]") && !html.equals("")) {
-				   //fileFinder(cmds);
-
+				   classifyingApples(m_url, num);					   
+			   
+				   //if user give status command with an html file
+				   }else if(cmds.matches("--[0-9][0-9][0-9]") && !html.equals("")) {
 				   String finall = "src\\nesabyte_bapples\\" + html;
 				   File directory = new File(finall);
 				   String fin = directory.getAbsolutePath();
 				   
 				   String number = cmds.substring(2);
 				   int num = Integer.parseInt(number.trim());
-				     classifyingHTML(fin, num);
-			   }else {
+				   classifyingHTML(fin, num);
+			   
+				   //if nothing matches, command is not allowed
+				   }else {
 				   System.out.println("Forbidden Command ["+ cmds + "]");
-			   }
-			 
-			   }	
-		   }else if(tree.size() > 0) { //if user inputs more than 0 URL
-			   classifyingApples(tree, 999);
+				   }
+			   }//end of for loop
+
+		   //if user inputs 1 URL
+		   }else if(m_url.size() == 1) { 
+			   classifyingApples(m_url, 999);
 			   
-			   
+		   //if user inputs 1 HTML   
 		   }else if(!html.equals("")) { // if user inputs an HTML 
 			   String finall = "src\\nesabyte_bapples\\" + html;
 			   File directory = new File(finall);
 			   String fin = directory.getAbsolutePath();
 			   classifyingHTML(fin, 999);
+			
+			//if nothing matches, command is not allowed
 		   }else {
 			   System.out.println("You gave me a bad command");
 		   }
 		   System.out.println("     ****************************");
 		   System.out.println("     ****** Bapples is out ******");
 		   System.out.println("     ****************************");
+		   
+		//catch all exception errors
 	   }catch(Exception e){
 		   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "\n");
   		}
 
 	   }	   
-	   
-	/*https://www.computing.dcu.ie/~humphrys/Notes/Networks/java.html*/
+
+
+	/***
+	 * this method is inspired from https://www.computing.dcu.ie/~humphrys/Notes/Networks/java.html
+	 * 
+	 * this method accepts a String containing a URL, and it will open a connection.
+	 * if connection is granted, it will get the response code of the link,
+	 * the connection max time is 10secs, 
+	 * then it returns an Integer that holds the status code.
+	 * 
+	 * @param link
+	 * @return
+	 * @throws Exception
+	 */
 	private static int AppleCode(String link) throws Exception {
 
 		HttpURLConnection connection = null;
@@ -173,11 +193,21 @@ public class Cleaner {
 	}
 	
 	//Pull all links from the body for easy retrieval
-	//http://blog.houen.net/java-get-url-from-string/
+	
+	/***
+	 * this method is inspired from http://blog.houen.net/java-get-url-from-string/
+	 * 
+	 * this method accepts a string, it finds all the links from the string.
+	 * It recognizes the link through the help of the regex.
+	 * then returns the LINKS
+	 * 
+	 * @param text
+	 * @return
+	 */
 	private static HashSet<String> pullLinks(String text) {
 		HashSet<String> links = new HashSet<String>();
-	
-		//https://gist.github.com/chrispinkney/069b09d2da5b9f7b73347d13ba3c32e7#file-index2-html-L9
+		
+		//regex to find the link
 		String regex = "(?:(?:https?|ftp)://)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(text);
@@ -186,23 +216,45 @@ public class Cleaner {
 			if (urlStr.startsWith("(") && urlStr.endsWith(")")){
 				urlStr = urlStr.substring(1, urlStr.length() - 1);
 				}
+			//if a link is found, save it in the hashset
 			links.add(urlStr);
 		}
 		return links;
 	}
 	
+	/***
+	 * this method accepts a string, it finds all the *.html from the string.
+	 * It recognizes the link .html the help of the regex. 
+	 * then returns the HTML FILE NAME
+	 * 
+	 * @param text
+	 * @return
+	 */
 	private static String pullHTML(String text) {
 		String HTMLStr = "";
+		
+		//regex to find the html filename
 		String regex ="[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|].html";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(text);
 		while(m.find()) {
 			HTMLStr = m.group();
+			
+			//return the html file name, if there is.
 			return HTMLStr;
 		}
+		//return an emtpy string
 		return HTMLStr;
 	}
 	
+	/***
+	 * this method accepts a string, it finds all the COMMANDS from the string.
+	 * It recognizes the link through the help of the regex.
+	 * then returns the COMMANDS
+	 * 
+	 * @param text
+	 * @return
+	 */
 	private static HashSet<String> pullCommands(String text){
 		 
 		HashSet<String> commands = new HashSet<String>();
@@ -224,91 +276,136 @@ public class Cleaner {
 		return commands;
 	}
 	
+	/**
+	 * this method takes in 2 parameters:
+	 * 1.) a string which is the absolute pathway of the .html file.
+	 * 2.) an in for the statcode, if the user wants to search for a specific status code.
+	 * 
+	 * this method reads from the *.html file then store all its contents in a string.
+	 * The string then is processed by the use of the pullLinks() method to take all of the links and be placed inside a HashSet.
+	 * Then each of the link will be passed into the AppleCode() method to check all the Status code.
+	 * then it prints out the link with its status code.
+	 * 
+	 * Each status code has their own color:
+	 *    = RED      = Bad Apples with status code 404 or 400
+	 *    = GREEN    = Good Apples with status code 200
+	 *    = GRAY     = Unknown Apples with other status code
+	 * 
+	 * @param file
+	 * @param statcode
+	 */
 	private static void classifyingHTML(String file, int statcode) {
 		//if user puts more urls to check
-		 //String file ="src/nesabyte_bapples/testing.html";
-	     
 		try {			
+			//reads from the *.html file then store all its contents in a string
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String inputLine;
 			StringBuilder a = new StringBuilder();
+			
+			//reading all the content of the HTML
 			while ((inputLine = reader.readLine()) != null)
-				   a.append(inputLine);
-				     String currentLine = reader.readLine();
-				     reader.close();
-				     String content = a.toString();
-								    
-				    HashSet<String> aLink= pullLinks(content);
-				    System.out.println("\nTotal Apple count: "+ aLink.size());
+				a.append(inputLine);
+			String currentLine = reader.readLine();
+			reader.close();
+			String content = a.toString();
+								 
+			//string then is processed by the use of the pullLinks() method to take all of the links and be placed inside a HashSet.
+			HashSet<String> aLink= pullLinks(content);
+			System.out.println("\nTotal Apple count: "+ aLink.size());
 
-					int Gcounter = 0, Bcounter = 0, Ucounter = 0;
+			//counters for good, bad, unknown links
+			int Gcounter = 0, Bcounter = 0, Ucounter = 0;
+			
+			//if the user wants the specific status code of 200, it will only print the links with status code 200
+			if(statcode == 200) {
+				System.out.println("Finding Apples with Status " + statcode);
 					
-					if(statcode == 200) {
-						System.out.println("Finding Apples with Status " + statcode);
+				for (String s : aLink)  {
+					int code = AppleCode(s.toString());
+					if(code == statcode) {
+						System.out.println(ANSI_GREEN + "[ " + statcode + " ]   GOOD APPLE    : "+ s.toString()); //green
+						Gcounter++;
+					}		
+				}
+				
+			//if the user wants the specific status code of 400 or 404, it will only print the links with status code 400 or 404
+			}else if(statcode == 400  || statcode == 404) {	
+					System.out.println("Finding Apples with Status " + statcode);
 						
-						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
-							if(code == statcode) {
-								System.out.println(ANSI_GREEN + "[ " + statcode + " ]   GOOD APPLE    : "+ s.toString()); //green
-								Gcounter++;
-							}		
-						}
-					}else if(statcode == 400  || statcode == 404) {	
-						System.out.println("Finding Apples with Status " + statcode);
-						
-						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
-							if(code == statcode) {
-								System.out.println(ANSI_RED + "[ " + statcode + " ]   BAD APPLE     : "+ s.toString()); //red
-								Bcounter++;		
-							}
-						}
-					}else if(statcode == 999) {
-						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
-																		
-							if(code == 400  || code == 404) {
-								System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
-								Bcounter++;
-							}else if(code == 200) {
-								System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
-								Gcounter++;
-							}else if(code == 0 ) {
-								System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ s.toString()); //magenta
-								Ucounter++;
-							}else {
-								System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ s.toString());//white
-								Ucounter++;
-							}
-						}
-					}else{
-						System.out.println("Finding Apples with Status " + statcode);
-						
-						for (String s : aLink)  {
-							int code = AppleCode(s.toString());							
-							if(code == statcode) {
-								System.out.println(ANSI_GRAY + "[ " + statcode + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
-								Ucounter++;
-							}
+					for (String s : aLink)  {
+						int code = AppleCode(s.toString());
+						if(code == statcode) {
+							System.out.println(ANSI_RED + "[ " + statcode + " ]   BAD APPLE     : "+ s.toString()); //red
+							Bcounter++;		
 						}
 					}
-					
-					System.out.println(ANSI_RESET +
-							           "--------------------------------------------------------");
-					System.out.println( ANSI_RESET + "      Done counting apples!");
-				    System.out.println("          Good apples:    " + Gcounter);
-					System.out.println("          Bad apples:     " + Bcounter);
-					System.out.println("          Unknown apples: " + Ucounter);
-					System.out.println("--------------------------------------------------------");								
-			   }catch (Exception e){
-				   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "[" + file + "]");
-			   		}
-			   
-	}
-	
-	private static void classifyingApples(HashSet<String> tree, int statcode) {
+			
+			//if the user does not have any specific status code, it will print all the links
+			}else if(statcode == 999) {
+				for (String s : aLink)  {
+					int code = AppleCode(s.toString());
+																
+					if(code == 400  || code == 404) {
+						System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
+						Bcounter++;
+					}else if(code == 200) {
+						System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
+						Gcounter++;
+					}else if(code == 0 ) {
+						System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ s.toString()); //magenta
+						Ucounter++;
+					}else {
+						System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ s.toString());//white
+						Ucounter++;
+					}
+				}
+			
+			//if user wants any other Status Code
+			}else{
+				System.out.println("Finding Apples with Status " + statcode);
+				
+				for (String s : aLink)  {
+						int code = AppleCode(s.toString());							
+						if(code == statcode) {
+							System.out.println(ANSI_GRAY + "[ " + statcode + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
+							Ucounter++;
+						}
+					}
+				}
+				
+				System.out.println(ANSI_RESET +
+						           "--------------------------------------------------------");
+				System.out.println( ANSI_RESET + "      Done counting apples!");
+			    System.out.println("          Good apples:    " + Gcounter);
+				System.out.println("          Bad apples:     " + Bcounter);
+				System.out.println("          Unknown apples: " + Ucounter);
+				System.out.println("--------------------------------------------------------");								
+		   }catch (Exception e){
+			   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "[" + file + "]");
+		   		}
+		}
+
+	/**
+	 * this method takes in 2 parameters:
+	 * 1.) a HashSet that contains url to be checked.
+	 * 2.) an in for the statcode, if the user wants to search for a specific status code.
+	 * 
+	 * this method reads from the url then store all its html resource contents in a string.
+	 * The string then is processed by the use of the pullLinks() method to take all of the links and be placed inside a HashSet.
+	 * Then each of the link will be passed into the AppleCode() method to check all the Status code.
+	 * then it prints out the link with its status code.
+	 * 
+	 * Each status code has their own color:
+	 *    = RED      = Bad Apples with status code 404 or 400
+	 *    = GREEN    = Good Apples with status code 200
+	 *    = GRAY     = Unknown Apples with other status code
+	 * 
+	 * @param file
+	 * @param statcode
+	 */
+	private static void classifyingApples(HashSet<String> m_url, int statcode) {
 		//if user puts more urls to check
-		   for(String multi_link : tree) {
+		   for(String multi_link : m_url) {
 			   System.out.println("\n[ Counting Apples at " + multi_link + " ]");
 			   try {
 				   //connecting to myUrl
@@ -322,19 +419,22 @@ public class Cleaner {
 			        		myURLConnection.getInputStream(), "UTF-8"));
 			        String inputLine;
 			        StringBuilder a = new StringBuilder();
+			        
+			        //the contents of the html is now in one String
 			        while ((inputLine = in.readLine()) != null)
 			            a.append(inputLine);
 			        in.close();
 
 			        String content = a.toString();
 				    
+			      //string then is processed by the use of the pullLinks() method to take all of the links and be placed inside a HashSet.
 				    HashSet<String> aLink= pullLinks(content);
 				    System.out.println("\nTotal Apple count: "+ aLink.size());
 
+				  //counters for good, bad, unknown links
 					int Gcounter = 0, Bcounter = 0, Ucounter = 0;
 													
-					//https://gist.github.com/chrispinkney/069b09d2da5b9f7b73347d13ba3c32e7#file-index2-html-L9
-					System.out.println("              -------- STATNUM : "+ statcode);
+					//if the user wants the specific status code of 200, it will only print the links with status code 200
 					if(statcode == 200) {
 						System.out.println("Finding Apples with Status " + statcode);
 						
@@ -345,6 +445,8 @@ public class Cleaner {
 								Gcounter++;
 							}		
 						}
+						
+					//if the user wants the specific status code of 400 or 404, it will only print the links with status code 400 or 404
 					}else if(statcode == 400  || statcode == 404) {	
 						System.out.println("Finding Apples with Status " + statcode);
 						
@@ -355,6 +457,8 @@ public class Cleaner {
 								Bcounter++;		
 							}
 						}
+						
+					//if the user does not have any specific status code, it will print all the links
 					}else if(statcode == 999) {
 						for (String s : aLink)  {
 							int code = AppleCode(s.toString());
@@ -373,6 +477,8 @@ public class Cleaner {
 								Ucounter++;
 							}
 						}
+						
+					//if user wants any other Status Code
 					}else{
 						System.out.println("Finding Apples with Status " + statcode);
 						
@@ -398,30 +504,23 @@ public class Cleaner {
 			   }
 	}
 	
+	
+	/***
+	 * This method is called when the user wants help, all commands is listed in here
+	 */
 	private static void bappleHelp(){
 		System.out.println(ANSI_RESET +
-		                   "-----------------------------------------------------------------------");
-		System.out.println("-    WELCOME TO BAPPLES! Finding bad apples from any apple trees      -");
-		System.out.println("-----------------------------------------------------------------------");
-		System.out.println("-       --v or --version | to check the Bapple version                -");
-		System.out.println("-       -2XX           | to list urls with status code: SUCCESS       -");
-		System.out.println("-       -3XX           | to list urls with status code: REDIRECTION   -");
-		System.out.println("-       -4XX           | to list urls with status code: CLIENT ERRORS -");
-		System.out.println("-       -5XX           | to list urls with status code: SERVER ERRORS -");
-		System.out.println("-----------------------------------------------------------------------");
+		                   "------------------------------------------------------------------------");
+		System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files  -");
+		System.out.println("------------------------------------------------------------------------");
+		System.out.println("-      --v or --version | to check the Bapple version                  -");
+		System.out.println("-       --2XX           | to list urls with status code: SUCCESS       -");
+		System.out.println("-       --3XX           | to list urls with status code: REDIRECTION   -");
+		System.out.println("-       --4XX           | to list urls with status code: CLIENT ERRORS -");
+		System.out.println("-       --5XX           | to list urls with status code: SERVER ERRORS -");
+		System.out.println("------------------------------------------------------------------------");
 	}
 	
-	private static boolean IsInt_ByException(String str){
-	    try
-	    {
-	        Integer.parseInt(str.trim());
-	        return true;
-	    }
-	    catch(NumberFormatException nfe)
-	    {
-	        return false;
-	    }
-	}
 }
 
 	
