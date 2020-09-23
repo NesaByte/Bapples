@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,14 +57,12 @@ public class Cleaner {
 		
 		String mUrl, html = "";
 		HashSet<String> tree;
-		HashSet<String> roots;
+		HashSet<String> commands;
 		
 	   if (args.length == 0)
 	   {
 		   bappleHelp();
-		   //mUrl = args[0];
-		   //tree= pullLinks(mUrl);
-		   //roots = pullCommands(mUrl);
+
 		   System.out.println("Gimme an AppleTree: ");
 		   
 		   Scanner sc = new Scanner(System.in);
@@ -72,51 +71,57 @@ public class Cleaner {
 		   mUrl = sc.nextLine();
 		   
 		   //get the commands from the command
-		   roots = pullCommands(mUrl);	   
+		   commands = pullCommands(mUrl);	   
 		
 		   //get the urls from the command
 		   tree = pullLinks(mUrl);
 		   
+		   //get html from the command
 		   html = pullHTML(mUrl);
-		   System.out.println("ARGS LENG: "+args.length + " ["+mUrl+"]");
 	   }
-	   else{		   
-		  		   
-		   //get the commands from the command
-		   roots = pullCommands(args.toString());	   
+	   else{	
+		  
+		   StringJoiner sb = new StringJoiner("");
+		   for(int i = 0; i < args.length; i++) {
+			   sb.add(args[i] + " ");
+		   }
+
+		      String str = sb.toString();
+		   commands = pullCommands(str);	   
 		
 		   //get the urls from the command
-		   tree = pullLinks(args.toString());
+		   tree = pullLinks(str);
 		   
-		   html = pullHTML(args.toString());
+		   html = pullHTML(str);
 		   
-		   System.out.println("ARGS LENG: "+args.length);
 		   
-		   }
+		}
+		   
 	   
-	   try {
-		   System.out.println("roots: "+ roots.size() +"     tree: "  + tree.size()+"     html: "  + html) ;
-		   
-		   if(roots.size() > 0) { //if user input more than 0 commands
-			   for(String cmds : roots) {
-				   System.out.println("cmds: [" + cmds +"] "+ tree.size());
+	   try {		   
+		   if(commands.size() > 0) { //if user input more than 0 commands
+			   for(String cmds : commands) {
 			   if(cmds.equals("--v") ||  cmds.equals("--version") )  {
 				   System.out.println("Bapples version: bap.v.01");
 			   }
 			   else if(cmds.matches("--h") ||  cmds.matches("--help")) {
 				   bappleHelp();
 			   }
-			   else if(cmds.matches("--[0-9][0-9][0-9]") && tree.size() > 0){  // cmds.matches("[0-9][0-9][0-9]") && tree.size() != 0){
+			   else if(cmds.matches("--[0-9][0-9][0-9]") && tree.size() > 0){ 
 				   String number = cmds.substring(2);
 				   int num = Integer.parseInt(number.trim());
 				   System.out.println("            nums: " + number);
 				   classifyingApples(tree, num);					   
 			   }else if(cmds.matches("--[0-9][0-9][0-9]") && !html.equals("")) {
 				   //fileFinder(cmds);
+
 				   String finall = "src\\nesabyte_bapples\\" + html;
+				   File directory = new File(finall);
+				   String fin = directory.getAbsolutePath();
+				   
 				   String number = cmds.substring(2);
 				   int num = Integer.parseInt(number.trim());
-				     classifyingHTML(finall, num);
+				     classifyingHTML(fin, num);
 			   }else {
 				   System.out.println("Forbidden Command ["+ cmds + "]");
 			   }
@@ -128,8 +133,9 @@ public class Cleaner {
 			   
 		   }else if(!html.equals("")) { // if user inputs an HTML 
 			   String finall = "src\\nesabyte_bapples\\" + html;
-			   System.out.println("     HTML ****************************" + finall);
-			   classifyingHTML(finall, 999);
+			   File directory = new File(finall);
+			   String fin = directory.getAbsolutePath();
+			   classifyingHTML(fin, 999);
 		   }else {
 			   System.out.println("You gave me a bad command");
 		   }
@@ -142,18 +148,6 @@ public class Cleaner {
 
 	   }	   
 	   
-    private static File[] fileFinder( String dirName){
-        File dir = new File(dirName);
-
-		   System.out.println("     ****************************" + dirName);
-        return dir.listFiles(new FilenameFilter() { 
-                 public boolean accept(File dir, String filename){
-                	 System.out.println("filename: " + filename + dir.toString());
-                	 return filename.endsWith(".txt"); }
-        } );
-
-    }
-	
 	/*https://www.computing.dcu.ie/~humphrys/Notes/Networks/java.html*/
 	private static int AppleCode(String link) throws Exception {
 
@@ -226,7 +220,6 @@ public class Cleaner {
 		while(maa.find()) {
 			String urlStrrr = maa.group();
 			commands.add(urlStrrr);
-			System.out.println("**********************************" + text);
 		}
 		return commands;
 	}
@@ -235,7 +228,7 @@ public class Cleaner {
 		//if user puts more urls to check
 		 //String file ="src/nesabyte_bapples/testing.html";
 	     
-		try {
+		try {			
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String inputLine;
 			StringBuilder a = new StringBuilder();
@@ -249,9 +242,7 @@ public class Cleaner {
 				    System.out.println("\nTotal Apple count: "+ aLink.size());
 
 					int Gcounter = 0, Bcounter = 0, Ucounter = 0;
-													
-					//https://gist.github.com/chrispinkney/069b09d2da5b9f7b73347d13ba3c32e7#file-index2-html-L9
-					System.out.println("              -------- STATNUM : "+ statcode);
+					
 					if(statcode == 200) {
 						System.out.println("Finding Apples with Status " + statcode);
 						
