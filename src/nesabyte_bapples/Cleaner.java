@@ -514,10 +514,10 @@ public class Cleaner {
 		System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files  -");
 		System.out.println("------------------------------------------------------------------------");
 		System.out.println("-      --v or --version | to check the Bapple version                  -");
-		System.out.println("-       --2XX           | to list urls with status code: SUCCESS       -");
-		System.out.println("-       --3XX           | to list urls with status code: REDIRECTION   -");
-		System.out.println("-       --4XX           | to list urls with status code: CLIENT ERRORS -");
-		System.out.println("-       --5XX           | to list urls with status code: SERVER ERRORS -");
+		System.out.println("-      --h or --help    | to check the Bapple help                     -");
+		System.out.println("-       --200           | to list urls with status code: SUCCESS       -");
+		System.out.println("-       --400 or --404  | to list urls with status code: CLIENT ERRORS -");
+		System.out.println("-       --XXX           | to list urls with status code: UNKNOWNS      -");
 		System.out.println("------------------------------------------------------------------------");
 	}
 	
