@@ -43,7 +43,7 @@ public class Cleaner {
 	public static final String ANSI_BLUE = "\u001B[34m";
 	public static final String ANSI_PURPLE = "\u001B[35m";
 	public static final String ANSI_CYAN = "\u001B[36m";
-	public static final String ANSI_WHITE = "\u001B[37m";
+	public static final String ANSI_GRAY = "\u001b[0m";
 	
 	/**
 	 * Demonstrate processing a single provided argument.
@@ -54,7 +54,7 @@ public class Cleaner {
 	public static void main(String[] args) throws Exception
 	{
 		
-		String mUrl;
+		String mUrl, html = "";
 		HashSet<String> tree;
 		HashSet<String> roots;
 		
@@ -76,7 +76,9 @@ public class Cleaner {
 		
 		   //get the urls from the command
 		   tree = pullLinks(mUrl);
-		   System.out.println("ARGS LENG: "+args.length);
+		   
+		   html = pullHTML(mUrl);
+		   System.out.println("ARGS LENG: "+args.length + " ["+mUrl+"]");
 	   }
 	   else{		   
 		  		   
@@ -86,41 +88,54 @@ public class Cleaner {
 		   //get the urls from the command
 		   tree = pullLinks(args.toString());
 		   
+		   html = pullHTML(args.toString());
+		   
 		   System.out.println("ARGS LENG: "+args.length);
 		   
 		   }
 	   
 	   try {
-		   System.out.println("roots: "+ roots.size() +"     tree: "  + tree.size());
-		   if(roots.size() > 0) {
+		   System.out.println("roots: "+ roots.size() +"     tree: "  + tree.size()+"     html: "  + html) ;
+		   
+		   if(roots.size() > 0) { //if user input more than 0 commands
 			   for(String cmds : roots) {
 				   System.out.println("cmds: [" + cmds +"] "+ tree.size());
-			   if(cmds.toLowerCase().equals("--v ") ||  cmds.toLowerCase().equals("--version ") )  {
+			   if(cmds.equals("--v") ||  cmds.equals("--version") )  {
 				   System.out.println("Bapples version: bap.v.01");
 			   }
-			   else if(cmds.equals("--h") ||  cmds.equals("--help")) {
+			   else if(cmds.matches("--h") ||  cmds.matches("--help")) {
 				   bappleHelp();
 			   }
-			   else if(IsInt_ByException(cmds)){  // cmds.matches("[0-9][0-9][0-9]") && tree.size() != 0){
-				   int num = Integer.parseInt(cmds.trim());
-				   System.out.println("            nums: " + num);
-				   classifyingApples(tree, num);   
-			   }else if(roots.size() == 0 && tree.size() != 0){
-				   classifyingApples(tree, 999);					   
-			   }else if(cmds.equals("*.txt")) {
-				   fileFinder(cmds);
+			   else if(cmds.matches("--[0-9][0-9][0-9]") && tree.size() > 0){  // cmds.matches("[0-9][0-9][0-9]") && tree.size() != 0){
+				   String number = cmds.substring(2);
+				   int num = Integer.parseInt(number.trim());
+				   System.out.println("            nums: " + number);
+				   classifyingApples(tree, num);					   
+			   }else if(cmds.matches("--[0-9][0-9][0-9]") && !html.equals("")) {
+				   //fileFinder(cmds);
+				   String finall = "src\\nesabyte_bapples\\" + html;
+				   String number = cmds.substring(2);
+				   int num = Integer.parseInt(number.trim());
+				     classifyingHTML(finall, num);
 			   }else {
-				   System.out.println("Command ["+ cmds + "] is forbidden");
+				   System.out.println("Forbidden Command ["+ cmds + "]");
 			   }
 			 
 			   }	
-		   }else if(tree.size() > 0) {
+		   }else if(tree.size() > 0) { //if user inputs more than 0 URL
 			   classifyingApples(tree, 999);
+			   
+			   
+		   }else if(!html.equals("")) { // if user inputs an HTML 
+			   String finall = "src\\nesabyte_bapples\\" + html;
+			   System.out.println("     HTML ****************************" + finall);
+			   classifyingHTML(finall, 999);
 		   }else {
-			   System.out.println("You gave me a bad tree!");
+			   System.out.println("You gave me a bad command");
 		   }
-		   
-		   System.out.println(" *** Curtains closed *** ");
+		   System.out.println("     ****************************");
+		   System.out.println("     ****** Bapples is out ******");
+		   System.out.println("     ****************************");
 	   }catch(Exception e){
 		   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "\n");
   		}
@@ -130,6 +145,7 @@ public class Cleaner {
     private static File[] fileFinder( String dirName){
         File dir = new File(dirName);
 
+		   System.out.println("     ****************************" + dirName);
         return dir.listFiles(new FilenameFilter() { 
                  public boolean accept(File dir, String filename){
                 	 System.out.println("filename: " + filename + dir.toString());
@@ -181,36 +197,122 @@ public class Cleaner {
 		return links;
 	}
 	
-	private static HashSet<String> pullCommands(String text){
-		HashSet<String> commands = new HashSet<String>();
-		String regex = "(--)[-A-Za-z0-9]*[-A-Za-z0-9+&@#/%=~_()|]";
+	private static String pullHTML(String text) {
+		String HTMLStr = "";
+		String regex ="[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|].html";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(text);
 		while(m.find()) {
-			String urlStr = m.group();
-			if (urlStr.startsWith("(") && urlStr.endsWith(")")){
-				urlStr = urlStr.substring(1, urlStr.length() - 1);
-				}
-			commands.add(urlStr);
+			HTMLStr = m.group();
+			return HTMLStr;
 		}
-		return commands;
-		
+		return HTMLStr;
 	}
 	
-	private static HashSet<String> pullCodes(String text){
-		HashSet<String> codes = new HashSet<String>();
-		String regex = "[0-9]*[0-9]";
+	private static HashSet<String> pullCommands(String text){
+		 
+		HashSet<String> commands = new HashSet<String>();
+		String regex = "--[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(text);
 		while(m.find()) {
 			String urlStr = m.group();
-			if (urlStr.startsWith("(") && urlStr.endsWith(")")){
-				urlStr = urlStr.substring(1, urlStr.length() - 1);
-				}
-			codes.add(urlStr);
+			commands.add(urlStr);
 		}
-		return codes;
 		
+		String regex_num = "--[0-9][0-9][0-9]";
+		Pattern paa = Pattern.compile(regex_num);
+		Matcher maa = paa.matcher(text);
+		while(maa.find()) {
+			String urlStrrr = maa.group();
+			commands.add(urlStrrr);
+			System.out.println("**********************************" + text);
+		}
+		return commands;
+	}
+	
+	private static void classifyingHTML(String file, int statcode) {
+		//if user puts more urls to check
+		 //String file ="src/nesabyte_bapples/testing.html";
+	     
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String inputLine;
+			StringBuilder a = new StringBuilder();
+			while ((inputLine = reader.readLine()) != null)
+				   a.append(inputLine);
+				     String currentLine = reader.readLine();
+				     reader.close();
+				     String content = a.toString();
+								    
+				    HashSet<String> aLink= pullLinks(content);
+				    System.out.println("\nTotal Apple count: "+ aLink.size());
+
+					int Gcounter = 0, Bcounter = 0, Ucounter = 0;
+													
+					//https://gist.github.com/chrispinkney/069b09d2da5b9f7b73347d13ba3c32e7#file-index2-html-L9
+					System.out.println("              -------- STATNUM : "+ statcode);
+					if(statcode == 200) {
+						System.out.println("Finding Apples with Status " + statcode);
+						
+						for (String s : aLink)  {
+							int code = AppleCode(s.toString());
+							if(code == statcode) {
+								System.out.println(ANSI_GREEN + "[ " + statcode + " ]   GOOD APPLE    : "+ s.toString()); //green
+								Gcounter++;
+							}		
+						}
+					}else if(statcode == 400  || statcode == 404) {	
+						System.out.println("Finding Apples with Status " + statcode);
+						
+						for (String s : aLink)  {
+							int code = AppleCode(s.toString());
+							if(code == statcode) {
+								System.out.println(ANSI_RED + "[ " + statcode + " ]   BAD APPLE     : "+ s.toString()); //red
+								Bcounter++;		
+							}
+						}
+					}else if(statcode == 999) {
+						for (String s : aLink)  {
+							int code = AppleCode(s.toString());
+																		
+							if(code == 400  || code == 404) {
+								System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
+								Bcounter++;
+							}else if(code == 200) {
+								System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
+								Gcounter++;
+							}else if(code == 0 ) {
+								System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ s.toString()); //magenta
+								Ucounter++;
+							}else {
+								System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ s.toString());//white
+								Ucounter++;
+							}
+						}
+					}else{
+						System.out.println("Finding Apples with Status " + statcode);
+						
+						for (String s : aLink)  {
+							int code = AppleCode(s.toString());							
+							if(code == statcode) {
+								System.out.println(ANSI_GRAY + "[ " + statcode + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
+								Ucounter++;
+							}
+						}
+					}
+					
+					System.out.println(ANSI_RESET +
+							           "--------------------------------------------------------");
+					System.out.println( ANSI_RESET + "      Done counting apples!");
+				    System.out.println("          Good apples:    " + Gcounter);
+					System.out.println("          Bad apples:     " + Bcounter);
+					System.out.println("          Unknown apples: " + Ucounter);
+					System.out.println("--------------------------------------------------------");								
+			   }catch (Exception e){
+				   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "[" + file + "]");
+			   		}
+			   
 	}
 	
 	private static void classifyingApples(HashSet<String> tree, int statcode) {
@@ -238,79 +340,66 @@ public class Cleaner {
 				    HashSet<String> aLink= pullLinks(content);
 				    System.out.println("\nTotal Apple count: "+ aLink.size());
 
-					int Gcounter = 0, Bcounter = 0, Rcounter = 0;
+					int Gcounter = 0, Bcounter = 0, Ucounter = 0;
 													
 					//https://gist.github.com/chrispinkney/069b09d2da5b9f7b73347d13ba3c32e7#file-index2-html-L9
 					System.out.println("              -------- STATNUM : "+ statcode);
-					if(statcode > 199 && statcode < 300) {
-						System.out.println("Finding Apples with Status: 2XX: ");
+					if(statcode == 200) {
+						System.out.println("Finding Apples with Status " + statcode);
 						
 						for (String s : aLink)  {
 							int code = AppleCode(s.toString());
-							System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
-							Gcounter++;	
+							if(code == statcode) {
+								System.out.println(ANSI_GREEN + "[ " + statcode + " ]   GOOD APPLE    : "+ s.toString()); //green
+								Gcounter++;
+							}		
 						}
-					}else if(statcode > 299 && statcode < 400) {	
-						System.out.println("Finding Apples with Status: 3XX: ");
+					}else if(statcode == 400  || statcode == 404) {	
+						System.out.println("Finding Apples with Status " + statcode);
 						
 						for (String s : aLink)  {
 							int code = AppleCode(s.toString());
-							System.out.println(ANSI_YELLOW + "[ " + code + " ]   OVERRIPE APPLE: "+ s.toString());//yellow
-							Rcounter++;	
-						}
-					}else if(statcode > 399  && statcode < 500) {	
-						System.out.println("Finding Apples with Status: 4XX: ");
-						
-						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
-							System.out.println(ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
-							Bcounter++;
-						}
-					}else if(statcode > 499 && statcode < 600){
-						System.out.println("Finding Apples with Status: 5XX: ");
-						
-						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
-																		
-							if(code == 500 ) {
-								System.out.println(ANSI_CYAN + "[ " + code + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
-								Rcounter++;
+							if(code == statcode) {
+								System.out.println(ANSI_RED + "[ " + statcode + " ]   BAD APPLE     : "+ s.toString()); //red
+								Bcounter++;		
 							}
 						}
 					}else if(statcode == 999) {
 						for (String s : aLink)  {
 							int code = AppleCode(s.toString());
 																		
-							if(code > 399  && code < 500) {
-								System.out.println(ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
+							if(code == 400  || code == 404) {
+								System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
 								Bcounter++;
-							}else if(code > 199 && code < 300) {
+							}else if(code == 200) {
 								System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
 								Gcounter++;
 							}else if(code == 0 ) {
-								System.out.println(ANSI_PURPLE + "[ ??? ]   ROTTEN APPLE  : "+ s.toString()); //magenta
-								Rcounter++;
-							}else if(code > 299 && code < 400) {
-								System.out.println(ANSI_YELLOW + "[ " + code + " ]   OVERRIPE APPLE: "+ s.toString());//yellow
-								Rcounter++;
-							}else if(code > 499 && code < 600 ) {
-								System.out.println(ANSI_CYAN + "[ " + code + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
-								Rcounter++;
+								System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ s.toString()); //magenta
+								Ucounter++;
 							}else {
-								System.out.println(ANSI_WHITE + "[ " + code + " ]   GOOD APPLE    : "+ s.toString());//white
-								Rcounter++;
+								System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ s.toString());//white
+								Ucounter++;
 							}
 						}
-					}else {
-						System.out.println("Code Error");
+					}else{
+						System.out.println("Finding Apples with Status " + statcode);
+						
+						for (String s : aLink)  {
+							int code = AppleCode(s.toString());							
+							if(code == statcode) {
+								System.out.println(ANSI_GRAY + "[ " + statcode + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
+								Ucounter++;
+							}
+						}
 					}
 					
 					System.out.println(ANSI_RESET +
 							           "--------------------------------------------------------");
 					System.out.println( ANSI_RESET + "      Done counting apples!");
-				    System.out.println("          Good apples: " + Gcounter);
-					System.out.println("          Bad apples: " + Bcounter);
-					System.out.println("          Rotten apples: " + Rcounter);
+				    System.out.println("          Good apples:    " + Gcounter);
+					System.out.println("          Bad apples:     " + Bcounter);
+					System.out.println("          Unknown apples: " + Ucounter);
 					System.out.println("--------------------------------------------------------");								
 			   }catch (Exception e){
 				   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "\n" + multi_link.toString());
