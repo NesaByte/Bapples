@@ -116,13 +116,13 @@ public class Cleaner {
 			   
 				   //if user give status command with an html file
 				   }else if(cmds.matches("--[0-9][0-9][0-9]") && !html.equals("")) {
-				   String finall = "src\\nesabyte_bapples\\" + html;
-				   File directory = new File(finall);
-				   String fin = directory.getAbsolutePath();
+				   //String finall = "src\\nesabyte_bapples\\" + html;
+				   File directory = new File(html);
+				   //String fin = directory.getAbsolutePath();
 				   
 				   String number = cmds.substring(2);
 				   int num = Integer.parseInt(number.trim());
-				   classifyingHTML(fin, num);
+				   classifyingHTML(directory.getAbsolutePath(), num);
 			   
 				   //if nothing matches, command is not allowed
 				   }else {
@@ -136,10 +136,10 @@ public class Cleaner {
 			   
 		   //if user inputs 1 HTML   
 		   }else if(!html.equals("")) { // if user inputs an HTML 
-			   String finall = "src\\nesabyte_bapples\\" + html;
-			   File directory = new File(finall);
-			   String fin = directory.getAbsolutePath();
-			   classifyingHTML(fin, 999);
+			   //String finall = "src\\nesabyte_bapples\\" + html;
+			   File directory = new File(html);
+			  // String fin = directory.getAbsolutePath();
+			   classifyingHTML(directory.getAbsolutePath(), 999);
 			
 			//if nothing matches, command is not allowed
 		   }else {
