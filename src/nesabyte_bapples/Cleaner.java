@@ -105,6 +105,15 @@ public class Cleaner {
 				   int num = Integer.parseInt(number.trim());
 				   classifyingHTML(directory.getAbsolutePath(), num);
 			   
+				   //if user wants to check if http can be https from a url
+				   }else if(cmds.matches("--secure") && m_url.size() > 0){
+					   checkSecureURL(m_url);
+				
+				  //if user wants to check if http can be https from a local html file
+				   }else if(cmds.matches("--secure") && !html.equals("")){
+					   checkSecureHTML(html);
+				   
+					   
 				   //if nothing matches, command is not allowed
 				   }else {
 				   System.out.println("Forbidden Command ["+ cmds + "]");
@@ -137,6 +146,120 @@ public class Cleaner {
 
 	   }	   
 
+	private static void checkSecureHTML(String file) {
+		//if user puts more urls to check
+		try {			
+			//reads from the *.html file then store all its contents in a string
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String inputLine;
+			StringBuilder a = new StringBuilder();
+			
+			//reading all the content of the HTML
+			while ((inputLine = reader.readLine()) != null)
+				a.append(inputLine);
+			String currentLine = reader.readLine();
+			reader.close();
+			String content = a.toString();
+			HashSet<String> aLink= pullLinks(content);
+	        
+	        findUnsecured(aLink);
+			
+		}catch (Exception e){
+			   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "[" + file + "]");
+   		}
+
+
+		
+   }
+	
+	private static void checkSecureURL(HashSet<String> url) {
+		for(String myUrl: url) {
+			try {
+				   //connecting to myUrl
+				   //Document myDoc = Jsoup.connect(myUrl).get();
+				   URL URL = new URL(myUrl);
+				   URLConnection myURLConnection = URL.openConnection();
+				   myURLConnection.connect();
+				   
+				   //read the html from the url
+			        BufferedReader in = new BufferedReader(new InputStreamReader(
+			        		myURLConnection.getInputStream(), "UTF-8"));
+			        String inputLine;
+			        StringBuilder a = new StringBuilder();
+			        while ((inputLine = in.readLine()) != null)
+			            a.append(inputLine);
+			        in.close();
+
+			        String content = a.toString();
+			        
+			        HashSet<String> aLink= pullLinks(content);
+			        
+			        findUnsecured(aLink);
+			        
+				    
+			}catch (Exception e){
+				   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "\n" + url);
+	   		}
+		}
+		
+   }
+	
+	
+	private static void findUnsecured(HashSet<String> links){
+		HashSet<String> unlinks = new HashSet<String>();
+		HashSet<String> unlinks_test = new HashSet<String>();
+		int Gcounter = 0, Bcounter = 0, Ucounter = 0;
+
+		for(String link : links) {
+			String regex = "(http://)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
+			Pattern p = Pattern.compile(regex);
+			Matcher m = p.matcher(link);
+			while(m.find()) {
+				String urlStr = m.group();
+				if (urlStr.startsWith("(") && urlStr.endsWith(")")){
+					urlStr = urlStr.substring(1, urlStr.length() - 1);
+					}
+				//if a link is found, save it in the hashset
+				unlinks.add(urlStr);
+				
+			}
+			
+			
+		for(String un : unlinks) {
+			StringBuilder str = new StringBuilder(un);
+			str.insert(4, 's');
+			try {
+				int code = AppleCode(str.toString());
+				if(code == 400  || code == 404) {
+					System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ str.toString()); //red
+					Bcounter++;
+				}else if(code == 200) {
+					System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ str.toString()); //green
+					Gcounter++;
+				}else if(code == 0 ) {
+					System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ str.toString()); //magenta
+					Ucounter++;
+				}else {
+					System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ str.toString());//white
+					Ucounter++;
+				}
+
+			}catch (Exception e){
+				   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "\n" + str.toString());
+	   		}
+			
+		}
+	
+		}
+		System.out.println(ANSI_RESET +
+		           "--------------------------------------------------------");
+System.out.println( ANSI_RESET + "      Done counting apples!");
+System.out.println("          Good apples:    " + Gcounter);
+System.out.println("          Bad apples:     " + Bcounter);
+System.out.println("          Unknown apples: " + Ucounter);
+System.out.println("--------------------------------------------------------");
+	}
+	
 
 	/***
 	 * this method is inspired from https://www.computing.dcu.ie/~humphrys/Notes/Networks/java.html
