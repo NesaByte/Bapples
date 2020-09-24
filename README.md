@@ -29,4 +29,5 @@ After cloning the repository, unzip folder, open cmd prompt, cd into /assets. Fi
 
 
 # LICENSE
+- [MIT](https://github.com/NesaByte/Bapples/blob/master/LICENSE)
 - Icons made by mangsaabguru from www.flaticon.com
