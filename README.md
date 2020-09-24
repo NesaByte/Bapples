@@ -1,4 +1,4 @@
-# BAPPLES 
+# BAPPLES <img src="https://github.com/NesaByte/Bapples/blob/master/assets/apple.png" width="48">
 Command line tool that takes in a textfile or url. Find Good, Bad, Unknown links.
 
 # FEATURES
@@ -29,3 +29,4 @@ After cloning the repository, unzip folder, open cmd prompt, cd into /assets. Fi
 
 
 # LICENSE
+- Icons made by mangsaabguru from www.flaticon.com
