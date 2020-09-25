@@ -12,14 +12,27 @@ Command line tool that takes in a textfile or url. Find Good, Bad, Unknown links
 - Add support for timeouts, DNS resolution issues, or other server errors when accessing a bad URL
 
 
-# USAGE
+# INSTALLATION
+Make sure you have java properly installed in your pc
+
+```java -version``` should give you "java version "15" 2020-09-15"
+
+```javac -version``` should give you "javac 15"
+
+If not, install java in your system from https://www.java.com/en/download/
+
 After cloning the repository, unzip folder, open cmd prompt, cd into /assets. 
 Finally, execution:
 
 ```java -jar bapples.jar <command>```
 
-Example command to check version and find all links with status 404 from testing.html ```jav -jar bapples.jar --v --404 testing.html```
-Example command to check URLS with http:// if they work with https:// from nesabyte.wordpress.com ```java -jar bapples.jar --secure https://nesabyte.wordpress.com/```
+Example command to check version and find all links with status 404 from testing.html 
+
+```jav -jar bapples.jar --v --404 testing.html```
+
+Example command to check URLS with http:// if they work with https:// from nesabyte.wordpress.com 
+
+```java -jar bapples.jar --secure https://nesabyte.wordpress.com/```
 
 # COMMANDS
 | code| description | how to use|
