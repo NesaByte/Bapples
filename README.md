@@ -26,14 +26,6 @@ Finally, execution:
 
 ```java -jar bapples.jar <command>```
 
-Example command to check version and find all links with status 404 from testing.html 
-
-```jav -jar bapples.jar --v --404 testing.html```
-
-Example command to check URLS with http:// if they work with https:// from nesabyte.wordpress.com 
-
-```java -jar bapples.jar --secure https://nesabyte.wordpress.com/```
-
 # COMMANDS
 | code| description | how to use|
 |-----------------------|----------------------------------------------|--|
