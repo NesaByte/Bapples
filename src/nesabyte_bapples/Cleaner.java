@@ -1,5 +1,11 @@
 package nesabyte_bapples;
 
+/*
+ * NESA BERTANICO - 104497185
+ * 
+ * */
+
+
 import java.net.*;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -10,11 +16,9 @@ import java.io.*;
 
 public class Cleaner {
 	
-	public static final String ANSI_RESET = "";// "\u001B[0m";
-	public static final String ANSI_RED = "";// "\u001B[31m";
-	public static final String ANSI_GREEN = "";// "\u001B[32m";
-	public static final String ANSI_GRAY = "";// "\u001b[0m";
 	
+	//set URL status code apart from 404 400 200 into 999
+	final static int unknown = 999;
 	/**
 	 * Demonstrate processing a single provided argument.
 	 *
@@ -68,8 +72,6 @@ public class Cleaner {
 		   
 		   //get the html from the command
 		   html = pullHTML(str);
-		   
-		   
 		}
 		   
 	   
@@ -122,18 +124,20 @@ public class Cleaner {
 
 		   //if user inputs 1 URL
 		   }else if(m_url.size() == 1) { 
-			   classifyingApples(m_url, 999);
+			   classifyingApples(m_url, unknown); // 
+			   
 			   
 		   //if user inputs 1 HTML   
 		   }else if(!html.equals("")) { // if user inputs an HTML 
 			   //String finall = "src\\nesabyte_bapples\\" + html;
 			   File directory = new File(html);
 			  // String fin = directory.getAbsolutePath();
-			   classifyingHTML(directory.getAbsolutePath(), 999);
+			   classifyingHTML(directory.getAbsolutePath(), unknown);
 			
 			//if nothing matches, command is not allowed
 		   }else {
 			   System.out.println("You gave me a bad command");
+			   bappleHelp();
 		   }
 		   System.out.println("     ****************************");
 		   System.out.println("     ****** Bapples is out ******");
@@ -223,26 +227,30 @@ public class Cleaner {
 				unlinks.add(urlStr);
 				
 			}
-			
-			
+		}			
+			StringBuilder str;
 		for(String un : unlinks) {
-			StringBuilder str = new StringBuilder(un);
+			str = new StringBuilder(un);
 			str.insert(4, 's');
+			
+			//System.out.println(un);
+		//	System.out.println(str.toString());
 			try {
 				int code = AppleCode(str.toString());
 				if(code == 400  || code == 404) {
-					System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ str.toString()); //red
+					System.out.println("[ " + code + " ]   BAD APPLE     : "+ str.toString());
 					Bcounter++;
 				}else if(code == 200) {
-					System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ str.toString()); //green
+					System.out.println("[ " + code + " ]   GOOD APPLE    : "+ str.toString()); 
 					Gcounter++;
 				}else if(code == 0 ) {
-					System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ str.toString()); //magenta
+					System.out.println("[ ??? ]   UNKNOWN APPLE : "+ str.toString()); 
 					Ucounter++;
 				}else {
-					System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ str.toString());//white
+					System.out.println("[ " + code + " ]   UNKNOWN APPLE : "+ str.toString());
 					Ucounter++;
 				}
+				
 
 			}catch (Exception e){
 				   System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "\n" + str.toString());
@@ -250,10 +258,9 @@ public class Cleaner {
 			
 		}
 	
-		}
-		System.out.println(ANSI_RESET +
-		           "--------------------------------------------------------");
-System.out.println( ANSI_RESET + "      Done counting apples!");
+		
+		System.out.println("--------------------------------------------------------");
+System.out.println("      Done counting apples!");
 System.out.println("          Good apples:    " + Gcounter);
 System.out.println("          Bad apples:     " + Bcounter);
 System.out.println("          Unknown apples: " + Ucounter);
@@ -425,9 +432,9 @@ System.out.println("--------------------------------------------------------");
 				System.out.println("Finding Apples with Status " + statcode);
 					
 				for (String s : aLink)  {
-					int code = AppleCode(s.toString());
+					int code = AppleCode(s);
 					if(code == statcode) {
-						System.out.println(ANSI_GREEN + "[ " + statcode + " ]   GOOD APPLE    : "+ s.toString()); //green
+						System.out.println("[ " + statcode + " ]   GOOD APPLE    : "+ s); //green
 						Gcounter++;
 					}		
 				}
@@ -437,29 +444,29 @@ System.out.println("--------------------------------------------------------");
 					System.out.println("Finding Apples with Status " + statcode);
 						
 					for (String s : aLink)  {
-						int code = AppleCode(s.toString());
+						int code = AppleCode(s);
 						if(code == statcode) {
-							System.out.println(ANSI_RED + "[ " + statcode + " ]   BAD APPLE     : "+ s.toString()); //red
+							System.out.println("[ " + statcode + " ]   BAD APPLE     : "+ s); //red
 							Bcounter++;		
 						}
 					}
 			
 			//if the user does not have any specific status code, it will print all the links
-			}else if(statcode == 999) {
+			}else if(statcode == unknown) {
 				for (String s : aLink)  {
-					int code = AppleCode(s.toString());
+					int code = AppleCode(s);
 																
 					if(code == 400  || code == 404) {
-						System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
+						System.out.println("[ " + code + " ]   BAD APPLE     : "+ s); //red
 						Bcounter++;
 					}else if(code == 200) {
-						System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
+						System.out.println("[ " + code + " ]   GOOD APPLE    : "+ s); //green
 						Gcounter++;
 					}else if(code == 0 ) {
-						System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ s.toString()); //magenta
+						System.out.println( "[ ??? ]   UNKNOWN APPLE : "+ s); //magenta
 						Ucounter++;
 					}else {
-						System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ s.toString());//white
+						System.out.println("[ " + code + " ]   UNKNOWN APPLE : "+ s);//white
 						Ucounter++;
 					}
 				}
@@ -469,17 +476,16 @@ System.out.println("--------------------------------------------------------");
 				System.out.println("Finding Apples with Status " + statcode);
 				
 				for (String s : aLink)  {
-						int code = AppleCode(s.toString());							
+						int code = AppleCode(s);							
 						if(code == statcode) {
-							System.out.println(ANSI_GRAY + "[ " + statcode + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
+							System.out.println("[ " + statcode + " ]   UNRIPE APPLE  : "+ s); // pink
 							Ucounter++;
 						}
 					}
 				}
 				
-				System.out.println(ANSI_RESET +
-						           "--------------------------------------------------------");
-				System.out.println( ANSI_RESET + "      Done counting apples!");
+				System.out.println("--------------------------------------------------------");
+				System.out.println("      Done counting apples!");
 			    System.out.println("          Good apples:    " + Gcounter);
 				System.out.println("          Bad apples:     " + Bcounter);
 				System.out.println("          Unknown apples: " + Ucounter);
@@ -543,9 +549,9 @@ System.out.println("--------------------------------------------------------");
 						System.out.println("Finding Apples with Status " + statcode);
 						
 						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
+							int code = AppleCode(s);
 							if(code == statcode) {
-								System.out.println(ANSI_GREEN + "[ " + statcode + " ]   GOOD APPLE    : "+ s.toString()); //green
+								System.out.println("[ " + statcode + " ]   GOOD APPLE    : "+ s); 
 								Gcounter++;
 							}		
 						}
@@ -555,29 +561,29 @@ System.out.println("--------------------------------------------------------");
 						System.out.println("Finding Apples with Status " + statcode);
 						
 						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
+							int code = AppleCode(s);
 							if(code == statcode) {
-								System.out.println(ANSI_RED + "[ " + statcode + " ]   BAD APPLE     : "+ s.toString()); //red
+								System.out.println("[ " + code + " ]   BAD APPLE     : "+ s);
 								Bcounter++;		
 							}
 						}
 						
 					//if the user does not have any specific status code, it will print all the links
-					}else if(statcode == 999) {
+					}else if(statcode == unknown) {
 						for (String s : aLink)  {
-							int code = AppleCode(s.toString());
+							int code = AppleCode(s);
 																		
 							if(code == 400  || code == 404) {
-								System.out.println(  ANSI_RED + "[ " + code + " ]   BAD APPLE     : "+ s.toString()); //red
+								System.out.println("[ " + code + " ]   BAD APPLE     : "+ s);
 								Bcounter++;
 							}else if(code == 200) {
-								System.out.println(ANSI_GREEN + "[ " + code + " ]   GOOD APPLE    : "+ s.toString()); //green
+								System.out.println("[ " + code + " ]   GOOD APPLE    : "+ s);
 								Gcounter++;
 							}else if(code == 0 ) {
-								System.out.println( ANSI_GRAY +          "[ ??? ]   UNKNOWN APPLE : "+ s.toString()); //magenta
+								System.out.println("[ ??? ]   UNKNOWN APPLE : "+ s);
 								Ucounter++;
 							}else {
-								System.out.println( ANSI_GRAY + "[ " + code + " ]   UNKNOWN APPLE : "+ s.toString());//white
+								System.out.println("[ " + code + " ]   UNKNOWN APPLE : "+ s);
 								Ucounter++;
 							}
 						}
@@ -587,17 +593,16 @@ System.out.println("--------------------------------------------------------");
 						System.out.println("Finding Apples with Status " + statcode);
 						
 						for (String s : aLink)  {
-							int code = AppleCode(s.toString());							
+							int code = AppleCode(s);							
 							if(code == statcode) {
-								System.out.println(ANSI_GRAY + "[ " + statcode + " ]   UNRIPE APPLE  : "+ s.toString()); // pink
+								System.out.println("[ " + statcode + " ]   UNRIPE APPLE  : "+ s); // pink
 								Ucounter++;
 							}
 						}
 					}
 					
-					System.out.println(ANSI_RESET +
-							           "--------------------------------------------------------");
-					System.out.println( ANSI_RESET + "      Done counting apples!");
+					System.out.println("--------------------------------------------------------");
+					System.out.println("      Done counting apples!");
 				    System.out.println("          Good apples:    " + Gcounter);
 					System.out.println("          Bad apples:     " + Bcounter);
 					System.out.println("          Unknown apples: " + Ucounter);
@@ -613,8 +618,7 @@ System.out.println("--------------------------------------------------------");
 	 * This method is called when the user wants help, all commands is listed in here
 	 */
 	private static void bappleHelp(){
-		System.out.println(ANSI_RESET +
-		                   "------------------------------------------------------------------------");
+		System.out.println("------------------------------------------------------------------------");
 		System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files  -");
 		System.out.println("------------------------------------------------------------------------");
 		System.out.println("-      --v or --version | to check the Bapple version                  -");
