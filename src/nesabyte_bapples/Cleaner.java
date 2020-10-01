@@ -36,7 +36,7 @@ public class Cleaner {
 	   {
 		   bappleHelp();
 
-		   System.out.println("Gimme an AppleTree: ");
+		   System.out.println("Gimme an AppleTree [ <filename> | <url> ]: ");
 		   
 		   Scanner sc = new Scanner(System.in);
 		   
