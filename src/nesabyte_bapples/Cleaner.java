@@ -623,9 +623,10 @@ System.out.println("--------------------------------------------------------");
 		System.out.println("------------------------------------------------------------------------");
 		System.out.println("-      --v or --version | to check the Bapple version                  -");
 		System.out.println("-      --h or --help    | to check the Bapple help                     -");
-		System.out.println("-       --200           | to list urls with status code: SUCCESS       -");
-		System.out.println("-       --400 or --404  | to list urls with status code: CLIENT ERRORS -");
-		System.out.println("-       --XXX           | to list urls with status code: UNKNOWNS      -");
+		System.out.println("-      <filename>       | to validate links within a file              -");
+		System.out.println("-      --200            | to list urls with status code: SUCCESS       -");
+		System.out.println("-      --400 or --404   | to list urls with status code: CLIENT ERRORS -");
+		System.out.println("-      --XXX            | to list urls with status code: UNKNOWNS      -");
 		System.out.println("------------------------------------------------------------------------");
 	}
 	
