@@ -11,6 +11,7 @@ Command line tool that takes in a textfile or url. Find Good, Bad, Unknown links
 - Added --XXX command to display URL with specific status code the user wants(e.g. --404 <url or .html>)
 - Add support for timeouts, DNS resolution issues, or other server errors when accessing a bad URL
 - Added support for coloured terminal text
+- Added support for --all, --good, --bad flags.
 
 
 # INSTALLATION
