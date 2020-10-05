@@ -1,4 +1,4 @@
-# BAPPLES <img src="https://github.com/NesaByte/Bapples/blob/master/assets/apple.png" width="48">
+# BAPPLES version 3 <img src="https://github.com/NesaByte/Bapples/blob/master/assets/apple.png" width="48">
 Command line tool that takes in a textfile or url. Find Good, Bad, Unknown links.
 
 # FEATURES
@@ -36,6 +36,9 @@ Finally, execution:
 |--400 or --404    | to list urls with status code: CLIENT ERRORS |java -jar bapples.jar --404 <url or .html>|
 |--XXX            | to list urls with status code: UNKNOWNS      |java -jar bapples.jar --310 <url or .html>|
 |--secure         | to check URLS with http:// if they work with https://|java -jar bapples.jar --secure <url or .html>|
+|--all | to list urls with all status | java -jar bapples.jar --all <url or .html> |
+|--good | to list urls with good status code: 200 |java -jar bapples.jar --good <url or .html> |
+|--bad | to list urls with bad status code: 404 and 400 | java -jar bapples.jar --bad <url or .html> |
 
 
 

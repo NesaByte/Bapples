@@ -41,22 +41,6 @@ public class Cleaner {
 	   if (args.length == 0)
 	   {
 		   bappleHelp();
-		   
-		   /*System.out.println("Gimme an AppleTree [ <filename> | <url> ]: ");
-		   
-		   Scanner sc = new Scanner(System.in);
-		   
-		   //take in the command
-		   mUrl = sc.nextLine();
-		   
-		   //get the commands from the command
-		   commands = pullCommands(mUrl);	   
-		
-		   //get the urls from the command
-		   m_url = pullLinks(mUrl);
-		   
-		   //get html from the command
-		   html = pullHTML(mUrl);*/
 	   }
 	   else{	
 		   
@@ -87,12 +71,39 @@ public class Cleaner {
 					   for(String cmds : commands) {
 					   
 						   //if user wants the check the version
-						   if(cmds.equals("--v") ||  cmds.equals("--version") )  {
-						   System.out.println("Bapples version: bap.v.01");
+						   if(cmds.matches("--v") ||  cmds.matches("--version") )  {
+						   System.out.println("Bapples version: bap.v.03");
 					   
 						   //if you wants to check the help
 						   } else if(cmds.matches("--h") ||  cmds.matches("--help")) {
 						   bappleHelp();
+						   
+						   //if you wants to check --all from HTML
+						   } else if(cmds.matches("--all") && !html.equals("")) {
+							   File directory = new File(html);
+							   classifyingHTML(directory.getAbsolutePath(), unknown);
+						   
+						   //if you wants to check --good from HTML
+						   } else if(cmds.matches("--good") && !html.equals("")) {
+							   File directory = new File(html);
+							   classifyingHTML(directory.getAbsolutePath(), 200);
+						   
+						   //if you wants to check --bad from HTML
+						   } else if(cmds.matches("--bad") && !html.equals("")) {
+							   File directory = new File(html);
+							   classifyingHTML(directory.getAbsolutePath(), 499);
+							   
+						   //if you wants to check --all from URL							   
+						   } else if(cmds.matches("--all") && m_url.size() > 0) {
+							   classifyingApples(m_url, unknown);
+							   
+						   //if you wants to check --good from URL
+						   } else if(cmds.matches("--good") && m_url.size() > 0) {
+							   classifyingApples(m_url, 200);
+							   
+						   //if you wants to check --bad from URL
+						   } else if(cmds.matches("--bad") && m_url.size() > 0) {
+							   classifyingApples(m_url, 499);
 					   
 						   //if user gives status command with a url
 						   } else if(cmds.matches("--[0-9][0-9][0-9]") && m_url.size() > 0){ 
@@ -450,6 +461,18 @@ public class Cleaner {
 						}
 					}
 			
+					//if the user wants the specific status code of 400 or 404, it will only print the links with status code 400 or 404
+			}else if(statcode == 499) {	
+					System.out.println("Finding Apples with Status 404 or 400");
+						
+					for (String s : aLink)  {
+						int code = AppleCode(s);
+						if(code == 404 || code ==400) {
+							System.out.println("[ " + statcode + " ]   BAD APPLE     : "+ s); //red
+							Bcounter++;		
+						}
+					}
+					
 			//if the user does not have any specific status code, it will print all the links
 			}else if(statcode == unknown) {
 				for (String s : aLink)  {
@@ -563,6 +586,17 @@ public class Cleaner {
 					}
 				}
 				
+			}else if(statcode == 499) {	
+				System.out.println("Finding Apples with Status 404 or 400");
+				
+				for (String s : aLink)  {
+					int code = AppleCode(s);
+					if(code == 400 || code == 404) {
+						System.out.println("[ " + code + " ]   BAD APPLE     : "+ s);
+						Bcounter++;		
+					}
+				}
+				
 			//if the user does not have any specific status code, it will print all the links
 			}else if(statcode == unknown) {
 				for (String s : aLink)  {
@@ -608,16 +642,20 @@ public class Cleaner {
 	 * This method is called when the user wants help, all commands is listed in here
 	 */
 	private static void bappleHelp(){
-		System.out.println("------------------------------------------------------------------------");
-		System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files  -");
-		System.out.println("------------------------------------------------------------------------");
-		System.out.println("-      --v or --version | to check the Bapple version                  -");
-		System.out.println("-      --h or --help    | to check the Bapple help                     -");
-		System.out.println("-      <filename>       | to validate links within a file              -");
-		System.out.println("-      --200            | to list urls with status code: SUCCESS       -");
-		System.out.println("-      --400 or --404   | to list urls with status code: CLIENT ERRORS -");
-		System.out.println("-      --XXX            | to list urls with status code: UNKNOWNS      -");
-		System.out.println("------------------------------------------------------------------------");
+		System.out.println("---------------------------------------------------------------------------------");
+		System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files           -");
+		System.out.println("---------------------------------------------------------------------------------");
+		System.out.println("-      --v or --version | to check the Bapple version                           -");
+		System.out.println("-      --h or --help    | to check the Bapple help                              -");
+		System.out.println("-      <filename>       | to validate links within a file                       -");
+		System.out.println("-      --200            | to list urls with status code: SUCCESS                -");
+		System.out.println("-      --400 or --404   | to list urls with status code: CLIENT ERRORS          -");
+		System.out.println("-      --XXX            | to list urls with status code: UNKNOWNS               -");
+		System.out.println("-      --secure         | to check URLS with http:// if they work with https:// -");
+		System.out.println("-      --all            | to list urls with all status                          -");
+		System.out.println("-      --good           | to list urls with good status code: 200               -");
+		System.out.println("-      --bad            | to list urls with bad status code: 404 and 400        -");
+		System.out.println("---------------------------------------------------------------------------------");
 	}
 	
 	/***
@@ -645,7 +683,7 @@ public class Cleaner {
 	 */
 	private static void bappleExitMessage() {
 		   System.out.println("     ****************************");
-		   System.out.println("     ****** Bapples is out ******");
+		   System.out.println("     *       Bapples is out     *");
 		   System.out.println("     ****************************");
 	}
 }
