@@ -1,3 +1,0 @@
-module nesabyte_bapples {
-	
-}
