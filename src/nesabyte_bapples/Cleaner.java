@@ -36,7 +36,7 @@ public class Cleaner {
      */
     public static void main(String[] args) throws Exception {
 
-        String mUrl, html, txt = "";
+        String mUrl, html = "";
         HashSet<String> m_url;
         HashSet<String> commands;
 
@@ -130,14 +130,7 @@ public class Cleaner {
                         } else if ((cmds.matches("--json") || cmds.matches("--j")) && !html.equals("")) {
                             tobeJSON(html);
 
-                            //if user wants to ignore urls, read ignore-url from txt file
-                        } else if((cmds.matches("--ignore") || cmds.matches("--i"))){
-                    		
-                        	txt = pullTXT(str);                       	
-                            File directory = new File(txt);
-                            classifyingTXT(directory.getAbsolutePath(),html, unknown);
-                        	
-                        	//if nothing matches, command is not allowed
+                            //if nothing matches, command is not allowed
                         } else {
                             System.out.println("Forbidden Command [" + cmds + "]");
                         }
@@ -736,7 +729,6 @@ public class Cleaner {
         System.out.println("-      --all            | to list urls with all status                          -");
         System.out.println("-      --good           | to list urls with good status code: 200               -");
         System.out.println("-      --bad            | to list urls with bad status code: 404 and 400        -");
-        System.out.println("-      --i or --ignore  | to list urls except ignore url list                   -");
         System.out.println("---------------------------------------------------------------------------------");
     }
 
@@ -767,212 +759,5 @@ public class Cleaner {
         System.out.println("     ****************************");
         System.out.println("     ****** Bapples is out ******");
         System.out.println("     ****************************");
-    }
-    
-    /***
-     * this method accepts a string, it finds all the *.txt from the string.
-     * It recognizes the link .txt the help of the regex.
-     * then returns the TXT FILE NAME
-     * 
-     * @author Eunbee Kim
-     * @param text
-     * @return
-     */
-    private static String pullTXT(String text) {
-        String TXTStr = "";
-
-        //regex to find the txt filename
-        String regex = "[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|].txt";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(text);
-        while (m.find()) {
-        	TXTStr = m.group();
-
-            //return the html file name, if there is.
-            return TXTStr;
-        }
-        //return an emtpy string
-        return TXTStr;
-    }
-    
-    /**
-     * this method takes in 2 parameters:
-     * It get the list of ignore from txt file, and the request url list are from html file.
-     * the request url will get rid of the list of ignore urls. 
-     * 
-     * @author Eunbee Kim
-     * @param txtFile
-     * @param htmlFile
-     * @param statcode
-     */
-    private static void classifyingTXT (String txtFile, String htmlFile, int statcode) {
-    	HashSet<String> aLink = null;
-    	HashSet<String> bLink = null;
-        //if user puts more urls to check
-        try {
-            //reads from the *.txt file then store all its contents in a string
-            BufferedReader reader = new BufferedReader(new FileReader(txtFile));
-            String inputLine;
-            StringBuilder a = new StringBuilder();
-
-            //reading all the content of the TXT
-            while ((inputLine = reader.readLine()) != null)
-                a.append(inputLine);
-            
-            reader.close();
-            String contentTXT = a.toString();
-
-            //string then is processed by the use of the pullLinksExcept() method to take all of the links and be placed inside a HashSet.
-            aLink = pullLinksExcept(contentTXT);
-            
-            //reads from the *.html file then store all its contents in a string
-            BufferedReader readerHtml = new BufferedReader(new FileReader(htmlFile));
-            String inputHtml;
-            StringBuilder b = new StringBuilder();
-
-            //reading all the content of the HTML
-            while ((inputHtml = readerHtml.readLine()) != null)
-                b.append(inputHtml);
-            
-            readerHtml.close();
-            
-            String contentHTML = b.toString();
-
-            //string then is processed by the use of the pullLinks() method to take all of the links and be placed inside a HashSet.
-            bLink = pullLinks(contentHTML);
-            
-            // string list has valid request urls applied ignored url set
-            HashSet<String> cLink = ignoreUrl(bLink, aLink);
-
-            System.out.println("\nTotal Apple count: " + cLink.size());
-
-            //counters for good, bad, unknown links
-            int Gcounter = 0, Bcounter = 0, Ucounter = 0;
-
-            //if the user wants the specific status code of 200, it will only print the links with status code 200
-            if (statcode == 200) {
-                System.out.println("Finding Apples with Status " + statcode);
-
-                for (String s : cLink) {
-                    int code = AppleCode(s);
-                    if (code == statcode) {
-                        System.out.println("[ " + statcode + " ]   GOOD APPLE    : " + s); //green
-                        Gcounter++;
-                    }
-                }
-                //if the user wants the specific status code of 400 or 404, it will only print the links with status code 400 or 404
-            } else if (statcode == 400 || statcode == 404) {
-                System.out.println("Finding Apples with Status " + statcode);
-
-                for (String s : cLink) {
-                    int code = AppleCode(s);
-                    if (code == statcode) {
-                        System.out.println("[ " + statcode + " ]   BAD APPLE     : " + s); //red
-                        Bcounter++;
-                    }
-                }
-                //if the user wants the specific status code of 400 or 404, it will only print the links with status code 400 or 404
-            } else if (statcode == 499) {
-                System.out.println("Finding Apples with Status 404 or 400");
-
-                for (String s : cLink) {
-                    int code = AppleCode(s);
-                    if (code == 404 || code == 400) {
-                        System.out.println("[ " + statcode + " ]   BAD APPLE     : " + s); //red
-                        Bcounter++;
-                    }
-                }
-                //if the user does not have any specific status code, it will print all the links
-            } else if (statcode == unknown) {
-                for (String s : cLink) {
-                    int code = AppleCode(s);
-
-                    if (code == 400 || code == 404) {
-                        System.out.println(RED + "[ " + code + " ]   BAD APPLE     : " + s + RESET); //red
-                        Bcounter++;
-                    } else if (code == 200) {
-                        System.out.println(GREEN + "[ " + code + " ]   GOOD APPLE    : " + s + RESET); //green
-                        Gcounter++;
-                    } else if (code == 0) {
-                        System.out.println(YELLOW + "[ ??? ]   UNKNOWN APPLE : " + s + RESET); //yellow
-                        Ucounter++;
-                    } else {
-                        System.out.println(YELLOW + "[ " + code + " ]   UNKNOWN APPLE : " + s + RESET);//white
-                        Ucounter++;
-                    }
-                }
-                //if user wants any other Status Code
-            } else {
-                System.out.println("Finding Apples with Status " + statcode);
-
-                for (String s : cLink) {
-                    int code = AppleCode(s);
-                    if (code == statcode) {
-                        System.out.println("[ " + statcode + " ]   UNRIPE APPLE  : " + s); // pink
-                        Ucounter++;
-                    }
-                }
-            }
-            bappleResults(Gcounter, Bcounter, Ucounter);
-
-        } catch (Exception e) {
-            System.out.println("\n\nYou gave me a Bad Apple Tree: " + e + "[" + txtFile + "]");
-        }
-
-    }
-    
-    
-    /***
-     * this method is saving only valid request urls to string set
-     *
-     * this method accepts a string, it finds invalid urls from html file.
-     * then returns the LINKS
-     * 
-     * @author Eunbee Kim
-     * @param text
-     * @return
-     */
-    private static HashSet<String> ignoreUrl(HashSet<String> text, HashSet<String> ignore) {
-        HashSet<String> links = new HashSet<String>();
-               
-        for(String url : text)
-        {
-        	 boolean ignorePass = true;
-        	
-        	  for(String ign : ignore)
-        	  {
-        		  if(url.contains(ign)|| url.startsWith(ign)) ignorePass = false; 
-        	  }
-        	  if(ignorePass) links.add(url);
-        }
-      
-        return links;
-    }
-
-    /***
-     * this method accepts a string, it finds all the links from the string.
-     * It recognizes the link through the help of the regex.(# except)
-     * then returns the LINKS
-     *
-     * @author Eunbee Kim
-     * @param text
-     * @return
-     */
-    private static HashSet<String> pullLinksExcept(String text) {
-        HashSet<String> links = new HashSet<String>();
-
-        //regex to find the link
-        String regex = "(?:(?:https?|ftp)://)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@/%=~_()|]";
-        Pattern p = Pattern.compile(regex);
-        Matcher m = p.matcher(text);
-        while (m.find()) {
-            String urlStr = m.group();
-            if (urlStr.startsWith("(") && urlStr.endsWith(")")) {
-                urlStr = urlStr.substring(1, urlStr.length() - 1);
-            }
-            //if a link is found, save it in the hashset
-            links.add(urlStr);
-        }
-        return links;
     }
 }

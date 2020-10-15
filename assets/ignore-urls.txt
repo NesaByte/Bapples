@@ -1,8 +1,0 @@
-# Ignore All Seneca College URLs
-https://senecacollege.ca
-# Ignore all Learn@Seneca URLs
-https://learn.senecacollege.ca/
-# test 
-http://www.wordpress.com
-# temp
-https://github.com/NesaByte/Bapples.git
