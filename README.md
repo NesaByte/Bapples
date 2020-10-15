@@ -13,6 +13,7 @@ Command line tool that takes in a textfile or url. Find Good, Bad, Unknown links
 - Added support for coloured terminal text
 - Added support for --all, --good, --bad flags
 - Added support for --j or --json  to output JSON
+- Added support for --i or --ignore to list urls except ignore url list 
 
 
 # INSTALLATION
@@ -40,6 +41,7 @@ Finally, execution:
 |--good           | to list urls with good status code: 200        | ```java -jar Bapples.jar --good <url or .html>``` |
 |--bad            | to list urls with bad status code: 404 and 400 | ```java -jar Bapples.jar --bad <url or .html>``` |
 |--j or --json    | to output JSON                                 | ```java -jar Bapples.jar --j *.html``` |
+|--i or --ignore  | to list urls except ignore url list            | ```java -jar Bapples.jar --ignore ignore-urls.txt testing.html``` | 
 
 
 
