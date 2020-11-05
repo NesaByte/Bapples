@@ -37,7 +37,7 @@ public class Cleaner{// extends UrlCleaner{
      */
     public static void main(String[] args) throws Exception {
 
-        String mUrl, html, txt = "";
+        String mUrl, html, txt = "", lh;
         HashSet<String> m_url;
         HashSet<String> commands;
 
@@ -64,6 +64,9 @@ public class Cleaner{// extends UrlCleaner{
             //get the html from the command
             html = Handlers.pullHTML(str);
 
+            //get single url localhost
+            lh = Handlers.pullLink(str);
+
             try {
                 //if user gave 1 or more commands
                 if (commands.size() > 0) {
@@ -73,7 +76,7 @@ public class Cleaner{// extends UrlCleaner{
 
                         //if user wants the check the version
                         if (cmds.matches("--v") || cmds.matches("--version")) {
-                            System.out.println("Bapples version: bap.v.03");
+                            System.out.println("Bapples version: bap.v.04");
 
                             //if you wants to check the help
                         } else if (cmds.matches("--h") || cmds.matches("--help")) {
@@ -132,11 +135,14 @@ public class Cleaner{// extends UrlCleaner{
                             JsonHandler.tobeJSON(html);
 
                             //if user wants to ignore urls, read ignore-url from txt file
-                        } else if((cmds.matches("--ignore") || cmds.matches("--i"))){
-
+                        } else if((cmds.matches("--ignore") || cmds.matches("--i"))) {
                             txt = HtmlHandler.pullTXT(str);
                             File directory = new File(txt);
-                            HtmlHandler.classifyingTXT(directory.getAbsolutePath(),html, unknown);
+                            HtmlHandler.classifyingTXT(directory.getAbsolutePath(), html, unknown);
+
+                            //if user wants to check urls from localhost
+                        } else if((cmds.matches("--localhost") || cmds.matches("--lh")) && m_url.size() > 0) {
+                            LocalHostHandler.classifyingLH(lh);
 
                             //if nothing matches, command is not allowed
                         } else {

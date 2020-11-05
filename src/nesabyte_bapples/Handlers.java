@@ -158,6 +158,23 @@ public class Handlers {
         return links;
     }
 
+    public static String pullLink(String text) {
+
+        //regex to find the link
+        String regex = "(?:(?:https?|ftp)://)[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]";
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(text);
+
+        while (m.find()) {
+            String urlStr = m.group();
+            if (urlStr.startsWith("(") && urlStr.endsWith(")")) {
+                urlStr = urlStr.substring(1, urlStr.length() - 1);
+            }
+            return urlStr;
+        }
+        return "";
+    }
+
     /***
      * this method accepts a string, it finds all the COMMANDS from the string.
      * It recognizes the link through the help of the regex.
@@ -191,21 +208,22 @@ public class Handlers {
      * This method is called when the user wants help, all commands is listed in here
      */
     public static void bappleHelp() {
-        System.out.println("---------------------------------------------------------------------------------");
-        System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files           -");
-        System.out.println("---------------------------------------------------------------------------------");
-        System.out.println("-      --v or --version | to check the Bapple version                           -");
-        System.out.println("-      --h or --help    | to check the Bapple help                              -");
-        System.out.println("-      <filename>       | to validate links within a file                       -");
-        System.out.println("-      --200            | to list urls with status code: SUCCESS                -");
-        System.out.println("-      --400 or --404   | to list urls with status code: CLIENT ERRORS          -");
-        System.out.println("-      --XXX            | to list urls with status code: UNKNOWNS               -");
-        System.out.println("-      --secure         | to check URLS with http:// if they work with https:// -");
-        System.out.println("-      --all            | to list urls with all status                          -");
-        System.out.println("-      --good           | to list urls with good status code: 200               -");
-        System.out.println("-      --bad            | to list urls with bad status code: 404 and 400        -");
-        System.out.println("-      --i or --ignore  | to list urls except ignore url list                   -");
-        System.out.println("---------------------------------------------------------------------------------");
+        System.out.println("-------------------------------------------------------------------------------------");
+        System.out.println("- WELCOME TO BAPPLES! Finding bad apples from any LINKS or HTML files               -");
+        System.out.println("-------------------------------------------------------------------------------------");
+        System.out.println("-      --v or --version     | to check the Bapple version                           -");
+        System.out.println("-      --h or --help        | to check the Bapple help                              -");
+        System.out.println("-      <filename>           | to validate links within a file                       -");
+        System.out.println("-      --200                | to list urls with status code: SUCCESS                -");
+        System.out.println("-      --400 or --404       | to list urls with status code: CLIENT ERRORS          -");
+        System.out.println("-      --XXX                | to list urls with status code: UNKNOWNS               -");
+        System.out.println("-      --secure             | to check URLS with http:// if they work with https:// -");
+        System.out.println("-      --all                | to list urls with all status                          -");
+        System.out.println("-      --good               | to list urls with good status code: 200               -");
+        System.out.println("-      --bad                | to list urls with bad status code: 404 and 400        -");
+        System.out.println("-      --i or --ignore      | to list urls except ignore url list                   -");
+        System.out.println("-      --lh or --localhost  | to check telescope links                              -");
+        System.out.println("-------------------------------------------------------------------------------------");
     }
 
     /***
