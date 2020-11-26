@@ -46,3 +46,15 @@ Finally, execution:
  - Click install and restart IntelliJ  
  
  - Right click the project -> SpotBugs
+ 
+ # Adding a JUnit test
+ When adding a JUnit test, we test by file. If you want to test DummyFunction.java, add or edit DummyFuntionTest.java at src/nesabyte_bapples/test/
+ 
+ ### Adding plug-in: Code Coverage for Java
+  - Go to File -> Settings -> Plugins
+  - Type in "Code Coverage for Java"
+  - Click install and restart IntelliJ
+  
+  - [For Single test] Right click on a specific test.java -> Run 'test.java' with Coverage
+  - [For All test] Right click the test folder -> Run 'Tests in 'nesabyte_bapples.test'' with Coverage
+ 
