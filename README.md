@@ -14,6 +14,7 @@ Command line tool that takes in a textfile or url. Find Good, Bad, Unknown links
 - Added support for --all, --good, --bad flags
 - Added support for --j or --json  to output JSON
 - Added support for --i or --ignore to list urls except ignore url list 
+- Added support for --lh or --localhost to check telescope links
 
 # LICENSE
 - [MIT](https://github.com/NesaByte/Bapples/blob/master/LICENSE)
