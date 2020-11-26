@@ -24,7 +24,8 @@ Finally, execution:
 |--good           | to list urls with good status code: 200        | ```java -jar Bapples.jar --good <url or .html>``` |
 |--bad            | to list urls with bad status code: 404 and 400 | ```java -jar Bapples.jar --bad <url or .html>``` |
 |--j or --json    | to output JSON                                 | ```java -jar Bapples.jar --j *.html``` |
-|--i or --ignore  | to list urls except ignore url list            | ```java -jar Bapples.jar --ignore ignore-urls.txt testing.html``` | 
+|--i or --ignore  | to list urls except ignore url list            | ```java -jar Bapples.jar --ignore ignore-urls.txt testing.html``` |
+|--lh or --localhost  | to check telescope links                   | ```java -jar Bapple.jar --lh http://localhost:3000 ``` |
 
 # Setting the environment 
 
